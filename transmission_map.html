@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Transmission Map — SigmaOne Macro Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#070e1f;
+    --navy-900:#0b1730;
+    --navy-800:#11214a;
+    --navy-700:#172c5e;
+    --navy-100:#e7ecf7;
+    --teal-500:#11a39a;
+    --teal-400:#1ec2b8;
+    --teal-50:#e7f8f6;
+    --slate-50:#f6f8fc;
+    --slate-200:#e3e8f1;
+    --slate-500:#5b6780;
+    --slate-600:#48526a;
+    --slate-900:#0e1424;
+    --white:#ffffff;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --shadow-card:0 1px 2px rgba(11,23,48,.04), 0 12px 32px -16px rgba(11,23,48,.18);
+    --map-hair:rgba(231,236,247,0.16);
+    --map-ink-dim:#9fb0d4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--slate-50);color:var(--slate-900);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.6;
+  }
+  h1,h2{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-0.01em;}
+  .wrap{max-width:960px;margin:0 auto;padding:56px 24px 80px;}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--teal-500);background:var(--teal-50);border:1px solid #c7ece8;
+    padding:7px 14px 7px 11px;border-radius:999px;margin:0 0 18px;
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal-500);}
+
+  .header{text-align:center;max-width:640px;margin:0 auto 8px;}
+  h1{font-size:34px;line-height:1.15;margin:0 0 14px;color:var(--navy-950);}
+  h1 span{color:var(--teal-500);}
+  .sub{font-size:16px;color:var(--slate-600);margin:0 0 8px;}
+  .hint{
+    font-size:13.5px;color:var(--slate-500);display:inline-flex;align-items:center;gap:8px;
+    background:var(--white);border:1px solid var(--slate-200);border-radius:999px;
+    padding:8px 16px;margin-top:6px;
+  }
+  .hint kbd{
+    font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--teal-500);
+    background:var(--teal-50);border-radius:5px;padding:2px 6px;
+  }
+
+  /* ---------- MAP CARD ---------- */
+  .map-card{
+    background:var(--navy-900);border:1px solid var(--map-hair);border-radius:var(--radius-lg);
+    padding:26px 20px 20px;margin:34px 0 18px;overflow-x:auto;box-shadow:var(--shadow-card);
+  }
+  .map-card svg{display:block;min-width:660px;width:100%;height:auto;}
+
+  .node{cursor:pointer;}
+  .node rect{
+    fill:var(--navy-800);stroke:var(--map-hair);stroke-width:1;
+    transition:fill .35s ease, stroke .35s ease, opacity .35s ease;
+  }
+  .node text{fill:var(--navy-100);font-family:'Inter',sans-serif;transition:opacity .35s ease;}
+  .node .lab{fill:var(--map-ink-dim);font-family:'Inter',sans-serif;}
+  .node.dim{opacity:.28;}
+  .node.active rect{fill:var(--navy-700);stroke:var(--teal-400);stroke-width:1.6;}
+  .node.origin rect{fill:var(--teal-500);stroke:var(--teal-400);stroke-width:1.6;}
+  .node.origin text{fill:var(--navy-950);font-weight:700;}
+  .node.origin .lab{fill:var(--navy-800);}
+  .node:hover rect{stroke:var(--teal-400);}
+
+  .edge{
+    stroke:var(--map-hair);stroke-width:1.6;fill:none;
+    transition:stroke .35s ease, opacity .35s ease;
+  }
+  .edge.dim{opacity:.22;}
+  .edge.active{
+    stroke:var(--teal-400);stroke-dasharray:5 4;
+    animation:dash 10s linear infinite;
+  }
+  @keyframes dash{to{stroke-dashoffset:-400;}}
+
+  .reset-row{display:flex;justify-content:flex-end;margin:-6px 0 4px;}
+  .reset-btn{
+    font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--slate-500);
+    background:var(--white);border:1px solid var(--slate-200);border-radius:999px;
+    padding:6px 14px;cursor:pointer;transition:color .2s ease, border-color .2s ease;
+  }
+  .reset-btn:hover{color:var(--teal-500);border-color:#c7ece8;}
+
+  /* ---------- READOUT ---------- */
+  .readout{
+    background:var(--white);border:1px solid var(--slate-200);border-radius:var(--radius-md);
+    padding:22px 26px;box-shadow:var(--shadow-card);
+  }
+  .readout .rlabel{
+    font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--teal-500);margin:0 0 4px;
+  }
+  .readout h3{font-family:'Sora',sans-serif;font-size:19px;color:var(--navy-950);margin:0 0 14px;}
+  .chain-line{
+    display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+    font-size:14px;color:var(--slate-600);padding:9px 0;border-top:1px solid var(--slate-200);
+  }
+  .chain-line:first-of-type{border-top:none;}
+  .chain-line .step{
+    background:var(--slate-50);border:1px solid var(--slate-200);border-radius:7px;
+    padding:4px 10px;color:var(--navy-950);font-weight:500;
+  }
+  .chain-line .step.start{background:var(--teal-50);border-color:#c7ece8;color:var(--teal-500);font-weight:700;}
+  .chain-line .step.end{background:var(--navy-950);border-color:var(--navy-950);color:var(--navy-100);font-weight:700;}
+  .chain-line .arrow{color:var(--slate-500);font-weight:700;}
+  .empty-msg{font-size:14px;color:var(--slate-500);}
+
+  .foot{
+    margin-top:28px;font-size:12px;color:var(--slate-500);text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="eyebrow">SigmaOne Research Desk · Interactive</div>
+    <h1>Trace the <span>transmission map</span></h1>
+    <p class="sub">Click any box to see exactly how that shock ripples through the system — every channel eventually converges on Market Price.</p>
+    <span class="hint">Try starting with <kbd>Inflation (CPI)</kbd> or <kbd>RBI / Fed</kbd></span>
+  </div>
+
+  <div class="reset-row"><button class="reset-btn" id="resetBtn">Reset selection</button></div>
+
+  <div class="map-card">
+    <svg id="mapSvg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- edges drawn first, underneath nodes -->
+      <g id="edgeLayer"></g>
+      <!-- nodes -->
+      <g id="nodeLayer"></g>
+    </svg>
+  </div>
+
+  <div class="readout" id="readout">
+    <div class="rlabel">Downstream chain</div>
+    <h3 id="readoutTitle">Select a box above</h3>
+    <div id="readoutBody"></div>
+  </div>
+
+  <p class="foot">Part of the SigmaOne Capital macro field guide · click-through diagram, illustrative relationships not live data</p>
+</div>
+
+<script>
+  const nodes = [
+    {id:'inflation',    x:10,  y:20,  w:150, title:'Inflation (CPI)',     sub:'rises above target'},
+    {id:'rbi',          x:230, y:20,  w:150, title:'RBI / Fed',           sub:'hikes policy rate'},
+    {id:'yields',       x:450, y:20,  w:150, title:'Bond Yields',         sub:'rise (bond prices fall)'},
+    {id:'valuations',   x:670, y:20,  w:220, title:'Equity Valuations',   sub:'P/E multiples compress'},
+    {id:'borrow',       x:230, y:130, w:150, title:'Borrowing Cost',      sub:'loans/EMIs get pricier'},
+    {id:'consumption',  x:450, y:130, w:150, title:'Consumption',         sub:'spending & demand slow'},
+    {id:'earnings',     x:670, y:130, w:220, title:'Corporate Earnings',  sub:'growth estimates trimmed'},
+    {id:'rupee',        x:230, y:240, w:150, title:'Rupee (INR)',         sub:'tends to strengthen'},
+    {id:'fii',          x:450, y:240, w:150, title:'FII Flows',           sub:'reprice India vs. US yield'},
+    {id:'price',        x:670, y:240, w:220, title:'Market Price',        sub:'Sensex / Nifty react'}
+  ];
+  const H = 56;
+  const byId = Object.fromEntries(nodes.map(n=>[n.id,n]));
+
+  // hand-routed paths so lines never cross a box
+  const edges = [
+    {from:'inflation',   to:'rbi',         d:'M160,48 H230'},
+    {from:'rbi',         to:'yields',      d:'M380,48 H450'},
+    {from:'yields',      to:'valuations',  d:'M600,48 H670'},
+    {from:'rbi',         to:'borrow',      d:'M305,76 V130'},
+    {from:'borrow',      to:'consumption', d:'M380,158 H450'},
+    {from:'consumption', to:'earnings',    d:'M600,158 H670'},
+    {from:'consumption', to:'fii',         d:'M525,186 V240'},
+    {from:'rbi',         to:'rupee',       d:'M380,48 H402 V210 H305 V240'},
+    {from:'rupee',       to:'fii',         d:'M380,268 H450'},
+    {from:'fii',         to:'price',       d:'M600,268 H670'},
+    {from:'earnings',    to:'price',       d:'M780,186 V240'},
+    {from:'valuations',  to:'price',       d:'M690,76 V96 H628 V268 H670'}
+  ];
+
+  const edgeLayer = document.getElementById('edgeLayer');
+  const nodeLayer = document.getElementById('nodeLayer');
+
+  edges.forEach((e,i)=>{
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', e.d);
+    path.setAttribute('class','edge');
+    path.dataset.from = e.from;
+    path.dataset.to = e.to;
+    path.id = 'edge-'+i;
+    edgeLayer.appendChild(path);
+  });
+
+  nodes.forEach(n=>{
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','node');
+    g.dataset.id = n.id;
+    g.setAttribute('tabindex','0');
+    g.setAttribute('role','button');
+    const cx = n.x + n.w/2;
+    g.innerHTML = `
+      <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${H}" rx="3"/>
+      <text x="${cx}" y="${n.y+22}" text-anchor="middle" font-size="12" font-weight="600">${n.title}</text>
+      <text class="lab" x="${cx}" y="${n.y+40}" text-anchor="middle" font-size="9">${n.sub}</text>
+    `;
+    g.addEventListener('click', ()=>select(n.id));
+    g.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); select(n.id); } });
+    nodeLayer.appendChild(g);
+  });
+
+  function outEdgesFrom(id){ return edges.filter(e=>e.from===id); }
+
+  function reachableSet(startId){
+    const seen = new Set([startId]);
+    const queue = [startId];
+    while(queue.length){
+      const cur = queue.shift();
+      outEdgesFrom(cur).forEach(e=>{
+        if(!seen.has(e.to)){ seen.add(e.to); queue.push(e.to); }
+      });
+    }
+    return seen;
+  }
+
+  function allPaths(startId){
+    const results = [];
+    function dfs(node, path){
+      path.push(node);
+      const outs = outEdgesFrom(node);
+      if(outs.length===0){ results.push([...path]); }
+      else{ outs.forEach(e=>dfs(e.to, path)); }
+      path.pop();
+    }
+    dfs(startId, []);
+    return results;
+  }
+
+  function select(id){
+    const reach = reachableSet(id);
+
+    document.querySelectorAll('.node').forEach(el=>{
+      const nid = el.dataset.id;
+      el.classList.remove('origin','active','dim');
+      if(nid===id) el.classList.add('origin');
+      else if(reach.has(nid)) el.classList.add('active');
+      else el.classList.add('dim');
+    });
+
+    document.querySelectorAll('.edge').forEach(el=>{
+      const isActive = reach.has(el.dataset.from) && reach.has(el.dataset.to);
+      el.classList.toggle('active', isActive);
+      el.classList.toggle('dim', !isActive);
+    });
+
+    const title = byId[id].title;
+    document.getElementById('readoutTitle').textContent = `If “${title}” moves first…`;
+
+    const body = document.getElementById('readoutBody');
+    const paths = allPaths(id);
+
+    if(paths.length===1 && paths[0].length===1){
+      body.innerHTML = `<p class="empty-msg">${title} is the end of this chain — everything else feeds into it, but it doesn't feed forward into anything else here. Try clicking an earlier box like Inflation or RBI / Fed.</p>`;
+      return;
+    }
+
+    body.innerHTML = paths.map(p=>{
+      const stepsHtml = p.map((nid,i)=>{
+        const cls = i===0 ? 'start' : (i===p.length-1 ? 'end' : '');
+        const sep = i===0 ? '' : '<span class="arrow">→</span>';
+        return `${sep}<span class="step ${cls}">${byId[nid].title}</span>`;
+      }).join('');
+      return `<div class="chain-line">${stepsHtml}</div>`;
+    }).join('');
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('.node').forEach(el=>el.classList.remove('origin','active','dim'));
+    document.querySelectorAll('.edge').forEach(el=>el.classList.remove('active','dim'));
+    document.getElementById('readoutTitle').textContent = 'Select a box above';
+    document.getElementById('readoutBody').innerHTML = '<p class="empty-msg">Click any box in the diagram to trace how that shock moves through the system.</p>';
+  });
+
+  // default view on load
+  select('inflation');
+</script>
+</body>
+</html>
