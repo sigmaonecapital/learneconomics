@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Market's Vital Signs — A Macro Indicator Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* SigmaOne brand palette — matches sigmaone-pricing.html */
+    --navy-950:#070e1f;
+    --navy-900:#0b1730;
+    --navy-800:#11214a;
+    --navy-700:#172c5e;
+    --navy-100:#e7ecf7;
+    --teal-500:#11a39a;
+    --teal-400:#1ec2b8;
+    --teal-50:#e7f8f6;
+    --slate-50:#f6f8fc;
+    --slate-200:#e3e8f1;
+    --slate-500:#5b6780;
+    --slate-600:#48526a;
+    --slate-900:#0e1424;
+    --white:#ffffff;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:9px;
+    --shadow-card:0 1px 2px rgba(11,23,48,.04), 0 12px 32px -16px rgba(11,23,48,.18);
+
+    /* legacy names used throughout the entries/charts below, mapped onto the palette above
+       so every chart, card and label updates automatically */
+    --navy:var(--navy-950);
+    --card:var(--navy-800);        /* dark transmission-map node fill */
+    --card-2:var(--navy-900);      /* dark transmission-map card background */
+    --teal:var(--teal-500);
+    --teal-dim:#8fd0c9;
+    --gold:var(--navy-700);        /* secondary/highlight data color (no amber in this palette) */
+    --red:#b3433c;                 /* the one functional exception — needed to read "negative" at a glance */
+    --ink:var(--slate-900);
+    --ink-dim:var(--slate-500);
+    --hair:var(--slate-200);
+    --hair-soft:rgba(14,20,36,0.07);
+
+    --cream:var(--slate-50);       /* page background */
+    --page-ink:var(--slate-900);
+    --page-ink-dim:var(--slate-500);
+    --page-hair:var(--slate-200);
+    --page-hair-soft:rgba(14,20,36,0.06);
+    --teal-ink:var(--teal-500);
+    --teal-tint:var(--teal-50);
+    --gold-ink:var(--navy-700);
+    --red-ink:#a8392f;
+
+    /* text/border reserved for the dark transmission-map card only */
+    --map-hair:rgba(231,236,247,0.16);
+    --map-ink:var(--navy-100);
+    --map-ink-dim:#9fb0d4;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--page-ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 28px;}
+  h1,h2,h3{font-family:'Sora',sans-serif;font-weight:700;letter-spacing:-0.01em;}
+  .mono{font-family:'Inter',sans-serif;}
+  a{color:var(--teal);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:72px 0 40px;
+    text-align:center;
+    border-bottom:1px solid var(--hair);
+    background:radial-gradient(ellipse at 50% -20%, rgba(17,163,154,0.09), transparent 60%);
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;
+    letter-spacing:.09em;text-transform:uppercase;color:var(--teal-500);
+    background:var(--teal-50);border:1px solid #c7ece8;
+    padding:7px 14px 7px 11px;border-radius:999px;margin:0 0 18px;
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal-500);}
+  .hero .eyebrow{margin:0 auto 18px;}
+  .hero h1{font-size:44px;line-height:1.1;margin:0 auto 16px;color:var(--navy);max-width:14em;}
+  .hero h1 em{font-style:normal;color:var(--teal-500);}
+  .hero p.lede{font-size:17px;color:var(--slate-600);max-width:56ch;margin:0 auto 30px;}
+  .ticker{
+    display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+    font-family:'Inter',sans-serif;font-size:12.5px;color:var(--slate-600);
+    border:none;
+  }
+  .ticker span{padding:7px 14px;border:1px solid var(--hair);border-radius:999px;background:var(--white);}
+  .ticker span b{color:var(--teal-500);font-weight:700;}
+
+  /* ---------- SECTION LABELS ---------- */
+  .section-head{padding:56px 0 18px;}
+  .section-head .eyebrow{margin-bottom:10px;}
+  .section-head h2{font-size:26px;color:var(--navy);margin:0 0 8px;}
+  .section-head p{color:var(--page-ink-dim);max-width:60ch;margin:0;font-size:15px;}
+
+  /* ---------- MATRIX TABLE ---------- */
+  .matrix{width:100%;border-collapse:collapse;font-size:13.5px;margin:18px 0 8px;}
+  .matrix th{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.06em;color:var(--page-ink-dim);
+    text-align:left;padding:10px 12px;border-bottom:1px solid var(--page-hair);
+  }
+  .matrix td{padding:11px 12px;border-bottom:1px solid var(--page-hair-soft);vertical-align:top;}
+  .matrix tr:hover td{background:var(--teal-50);}
+  .matrix td.name{color:var(--navy);font-weight:600;white-space:nowrap;}
+  .up{color:var(--teal-500);} .down{color:var(--red-ink);} .mix{color:var(--gold-ink);}
+
+  /* ---------- TRANSMISSION MAP (the one deliberate dark accent, like the pricing page's plan switcher) ---------- */
+  .map-card{
+    background:var(--card-2);border:1px solid var(--map-hair);border-radius:var(--radius-lg);
+    padding:28px 22px 20px;margin:22px 0 10px;overflow-x:auto;box-shadow:var(--shadow-card);
+  }
+  .map-card svg{display:block;min-width:640px;width:100%;height:auto;}
+  .flow-line{stroke:var(--teal);stroke-width:1.6;fill:none;stroke-dasharray:5 4;animation:dash 22s linear infinite;}
+  @keyframes dash{to{stroke-dashoffset:-400;}}
+  /* flowing-dash trend lines used across the indicator entries below — keeps each
+     line's own stroke color, just adds the marching-dash motion */
+  .dash-flow{stroke-dasharray:5 4;animation:dash 14s linear infinite;}
+  .flow-node rect{fill:var(--card);stroke:var(--map-hair);stroke-width:1;}
+  .flow-node text{fill:var(--map-ink);font-family:'Inter',sans-serif;}
+  .flow-node .lab{fill:var(--map-ink-dim);font-family:'Inter',sans-serif;}
+
+  /* ---------- INDICATOR ENTRY ---------- */
+  .entry{border-top:1px solid var(--page-hair);padding:38px 0 14px;}
+  .entry:last-of-type{border-bottom:1px solid var(--page-hair);}
+  .entry-head{display:flex;align-items:baseline;gap:16px;margin-bottom:6px;}
+  .entry-num{font-family:'Inter',sans-serif;font-weight:700;font-size:13px;color:var(--teal-ink);letter-spacing:0.02em;}
+  .entry-head h3{font-size:23px;color:var(--navy);margin:0;}
+  .entry-alias{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--page-ink-dim);margin:0 0 18px 40px;}
+
+  .kid-box{
+    display:flex;gap:14px;background:var(--teal-tint);
+    border-left:2px solid var(--gold-ink);padding:14px 18px;margin:16px 0 22px;
+    border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .kid-box .tag{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:10px;text-transform:uppercase;
+    letter-spacing:0.1em;color:var(--gold-ink);white-space:nowrap;padding-top:2px;
+  }
+  .kid-box p{margin:0;font-size:14.5px;color:var(--page-ink);}
+
+  .grid2{display:grid;grid-template-columns:1.15fr 0.85fr;gap:28px;margin:18px 0;}
+  @media(max-width:700px){.grid2{grid-template-columns:1fr;}}
+  .body-text p{font-size:15px;color:var(--page-ink);margin:0 0 12px;}
+  .body-text strong{color:var(--navy);}
+
+  .impact-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:9px 0;border-bottom:1px solid var(--page-hair-soft);font-size:13.5px;
+  }
+  .impact-row:last-child{border-bottom:none;}
+  .impact-row .lab{color:var(--page-ink-dim);font-family:'Inter',sans-serif;font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:0.04em;}
+  .arrow{font-family:'Inter',sans-serif;font-weight:600;}
+
+  .chart-card{background:var(--white);border:1px solid var(--hair);border-radius:var(--radius-md);padding:16px 16px 10px;box-shadow:var(--shadow-card);}
+  .chart-card svg{display:block;width:100%;height:auto;}
+  .chart-cap{font-family:'Inter',sans-serif;font-weight:600;font-size:10.5px;color:var(--ink-dim);text-align:right;margin-top:6px;text-transform:uppercase;letter-spacing:0.04em;}
+
+  .example{
+    background:var(--white);border:1px solid var(--hair);border-radius:var(--radius-md);
+    padding:16px 20px;margin-top:6px;box-shadow:var(--shadow-card);
+  }
+  .example .tag{font-family:'Inter',sans-serif;font-weight:600;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;display:block;}
+  .example p{margin:0;font-size:14px;color:var(--ink-dim);}
+  .example strong{color:var(--ink);}
+
+  /* ---------- CLOSING ---------- */
+  .closing{padding:54px 0 90px;}
+  .cheat{background:var(--white);border:1px solid var(--hair);border-radius:var(--radius-md);padding:22px 26px;margin-top:20px;box-shadow:var(--shadow-card);}
+  .cheat h4{font-family:'Inter',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-ink);margin:0 0 12px;}
+  .cheat ul{margin:0;padding-left:18px;}
+  .cheat li{font-size:14px;color:var(--ink);margin-bottom:8px;}
+  .foot{
+    background:var(--white);border:1px solid var(--hair);border-radius:var(--radius-md);margin:8px 0 60px;
+    padding:22px 26px;font-family:'Inter',sans-serif;font-size:11.5px;color:var(--ink-dim);box-shadow:var(--shadow-card);
+  }
+  .foot .foot-label{color:var(--gold-ink);letter-spacing:0.08em;text-transform:uppercase;font-weight:700;font-size:11px;display:block;margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Sigma&nbsp;One&nbsp;Research&nbsp;Desk · Field Guide</div>
+    <h1>The Market's Vital Signs — <em>how the economy talks, and how price listens.</em></h1>
+    <p class="lede">Every one of these numbers is the economy checking its own pulse. Markets don't move on rumours alone — they move because thousands of traders are all reading the same vital signs and repricing risk in real time. This guide walks through the 14 indicators that matter most, what each one actually measures, why price reacts the way it does, and how they all feed into each other.</p>
+    <div class="ticker">
+      <span>GDP <b>↑ growth</b></span>
+      <span>CPI <b>inflation</b></span>
+      <span>REPO <b>rate</b></span>
+      <span>10Y <b>yield</b></span>
+      <span>PMI <b>activity</b></span>
+      <span>USD/INR <b>currency</b></span>
+      <span>FII/DII <b>flows</b></span>
+    </div>
+  </section>
+
+  <!-- QUICK MATRIX -->
+  <section class="section-head">
+    <div class="eyebrow">01 · Orientation</div>
+    <h2>The 14 indicators, at a glance</h2>
+    <p>Before the detail — a cheat sheet. "Reaction" is the market's typical first reflex, not a rule; context (starting point, surprise vs. expectation) can flip it.</p>
+  </section>
+  <table class="matrix">
+    <tr><th>Indicator</th><th>Tracks</th><th>Frequency</th><th>Typical equity reaction to an upside surprise</th></tr>
+    <tr><td class="name">GDP Growth</td><td>Size &amp; speed of the economy</td><td>Quarterly</td><td class="up">Positive</td></tr>
+    <tr><td class="name">Inflation (CPI/WPI)</td><td>Cost of living / cost of production</td><td>Monthly</td><td class="down">Negative (fear of rate hikes)</td></tr>
+    <tr><td class="name">Interest Rate</td><td>Cost of money itself</td><td>Every policy meeting</td><td class="mix">Depends on direction</td></tr>
+    <tr><td class="name">Bond Yields</td><td>Government's borrowing cost</td><td>Continuous</td><td class="down">Rising yields = negative for equity</td></tr>
+    <tr><td class="name">PMI</td><td>Factory &amp; services activity</td><td>Monthly</td><td class="up">Positive</td></tr>
+    <tr><td class="name">IIP</td><td>Actual factory output</td><td>Monthly (lagged)</td><td class="up">Mildly positive</td></tr>
+    <tr><td class="name">Unemployment</td><td>Jobs &amp; labour slack</td><td>Monthly</td><td class="mix">Low unemployment can worry bond markets</td></tr>
+    <tr><td class="name">Fiscal Deficit</td><td>Govt. spending vs. income</td><td>Monthly/Annual</td><td class="down">Wider deficit = negative for bonds</td></tr>
+    <tr><td class="name">Current Account/Trade</td><td>Money in vs. out of the country</td><td>Quarterly/Monthly</td><td class="down">Wider deficit = negative for rupee</td></tr>
+    <tr><td class="name">USD/INR</td><td>Value of the rupee</td><td>Continuous</td><td class="mix">Depends on sector (importer vs exporter)</td></tr>
+    <tr><td class="name">Money Supply / Credit</td><td>Liquidity in the system</td><td>Fortnightly/Monthly</td><td class="up">More liquidity = positive</td></tr>
+    <tr><td class="name">Crude Oil</td><td>Energy input cost</td><td>Continuous</td><td class="down">Rising oil = negative for India</td></tr>
+    <tr><td class="name">FII/DII Flows</td><td>Who's actually buying</td><td>Daily</td><td class="up">Net buying = positive</td></tr>
+    <tr><td class="name">Consumer Confidence</td><td>How people feel about spending</td><td>Monthly/Bi-monthly</td><td class="up">Positive</td></tr>
+  </table>
+
+  <!-- TRANSMISSION MAP -->
+  <section class="section-head">
+    <div class="eyebrow">02 · The Big Picture</div>
+    <h2>The transmission map — how one number becomes a hundred others</h2>
+    <p>No indicator moves the market alone. They move each other first, in a chain reaction, and the market prices the whole chain at once. This is the core loop worth memorising.</p>
+  </section>
+  <div class="map-card">
+    <svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- nodes -->
+      <g class="flow-node"><rect x="10" y="20" width="150" height="56" rx="3"/><text x="85" y="42" text-anchor="middle" font-size="12" font-weight="600">Inflation (CPI)</text><text class="lab" x="85" y="60" text-anchor="middle" font-size="9">rises above target</text></g>
+      <g class="flow-node"><rect x="230" y="20" width="150" height="56" rx="3"/><text x="305" y="42" text-anchor="middle" font-size="12" font-weight="600">RBI / Fed</text><text class="lab" x="305" y="60" text-anchor="middle" font-size="9">hikes policy rate</text></g>
+      <g class="flow-node"><rect x="450" y="20" width="150" height="56" rx="3"/><text x="525" y="42" text-anchor="middle" font-size="12" font-weight="600">Bond Yields</text><text class="lab" x="525" y="60" text-anchor="middle" font-size="9">rise (bond prices fall)</text></g>
+      <g class="flow-node"><rect x="670" y="20" width="220" height="56" rx="3"/><text x="780" y="42" text-anchor="middle" font-size="12" font-weight="600">Equity Valuations</text><text class="lab" x="780" y="60" text-anchor="middle" font-size="9">P/E multiples compress</text></g>
+
+      <g class="flow-node"><rect x="230" y="130" width="150" height="56" rx="3"/><text x="305" y="152" text-anchor="middle" font-size="12" font-weight="600">Borrowing Cost</text><text class="lab" x="305" y="170" text-anchor="middle" font-size="9">loans/EMIs get pricier</text></g>
+      <g class="flow-node"><rect x="450" y="130" width="150" height="56" rx="3"/><text x="525" y="152" text-anchor="middle" font-size="12" font-weight="600">Consumption</text><text class="lab" x="525" y="170" text-anchor="middle" font-size="9">spending &amp; demand slow</text></g>
+      <g class="flow-node"><rect x="670" y="130" width="220" height="56" rx="3"/><text x="780" y="152" text-anchor="middle" font-size="12" font-weight="600">Corporate Earnings</text><text class="lab" x="780" y="170" text-anchor="middle" font-size="9">growth estimates trimmed</text></g>
+
+      <g class="flow-node"><rect x="230" y="240" width="150" height="56" rx="3"/><text x="305" y="262" text-anchor="middle" font-size="12" font-weight="600">Rupee (INR)</text><text class="lab" x="305" y="280" text-anchor="middle" font-size="9">tends to strengthen</text></g>
+      <g class="flow-node"><rect x="450" y="240" width="150" height="56" rx="3"/><text x="525" y="262" text-anchor="middle" font-size="12" font-weight="600">FII Flows</text><text class="lab" x="525" y="280" text-anchor="middle" font-size="9">reprice India vs. US yield</text></g>
+      <g class="flow-node"><rect x="670" y="240" width="220" height="56" rx="3"/><text x="780" y="262" text-anchor="middle" font-size="12" font-weight="600">Market Price</text><text class="lab" x="780" y="280" text-anchor="middle" font-size="9">Sensex / Nifty react</text></g>
+
+      <!-- flows -->
+      <path class="flow-line" d="M160,48 H230"/>
+      <path class="flow-line" d="M380,48 H450"/>
+      <path class="flow-line" d="M600,48 H670"/>
+      <path class="flow-line" d="M305,76 V130"/>
+      <path class="flow-line" d="M380,158 H450"/>
+      <path class="flow-line" d="M600,158 H670"/>
+      <path class="flow-line" d="M525,186 V240"/>
+      <path class="flow-line" d="M380,268 H450"/>
+      <path class="flow-line" d="M600,268 H670"/>
+      <path class="flow-line" d="M690,76 V96 H628 V268 H670" stroke="var(--gold)"/>
+      <path class="flow-line" d="M780,186 V240"/>
+      <path class="flow-line" d="M380,48 H402 V210 H305 V240" stroke="var(--gold)"/>
+    </svg>
+  </div>
+  <p style="font-size:13px;color:var(--ink-dim);margin-top:10px;">Read the three rows as one story: <strong style="color:var(--ink)">top row</strong> is the policy chain (inflation → rates → yields → valuations), <strong style="color:var(--ink)">middle row</strong> is the real-economy chain (cost of borrowing → demand → earnings), <strong style="color:var(--ink)">bottom row</strong> is the capital-flow chain (currency → FII flows → index price). The dark navy line shows earnings and flows converging on the same final print.</p>
+
+  <!-- ================= INDICATOR ENTRIES ================= -->
+  <section class="section-head">
+    <div class="eyebrow">03 · The Indicators</div>
+    <h2>Fourteen numbers, in detail</h2>
+    <p>Each entry: what it is in plain language, what it actually measures, why traders watch it, its typical push on equity / bonds / currency / commodities, and a worked example.</p>
+  </section>
+
+  <!-- 01 GDP -->
+  <div class="entry" id="gdp">
+    <div class="entry-head"><span class="entry-num">01</span><h3>GDP Growth Rate</h3></div>
+    <p class="entry-alias">Gross Domestic Product — "the size of the whole economy's paycheck this quarter"</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>Imagine your whole class sells lemonade for a summer. GDP is just: how much money did the <em>whole class</em> make together this month, compared to last month? If everyone sold more lemonade, the "class economy" grew.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the total value of all goods and services a country produces in a period — consumption + investment + government spending + (exports − imports). Released quarterly by India's National Statistical Office (and equivalents everywhere: BEA in the US).</p>
+        <p><strong>Why the market cares:</strong> GDP is the scoreboard for every company's revenue opportunity at once. Faster GDP growth usually means faster earnings growth down the line — it's the denominator for almost every valuation argument ("India will grow earnings at X% because the economy grows at Y%").</p>
+        <p><strong>The catch:</strong> GDP is a lagging, backward-looking number — by the time it's published, the quarter is already over. Markets react more to the <em>surprise</em> versus consensus estimates than to the number itself.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)" stroke-width="1"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)">
+            <text x="25" y="135">Q1</text><text x="70" y="135">Q2</text><text x="115" y="135">Q3</text><text x="160" y="135">Q4</text><text x="205" y="135">Q1</text>
+          </g>
+          <rect x="20" y="70" width="28" height="50" fill="var(--teal-dim)"/>
+          <rect x="65" y="55" width="28" height="65" fill="var(--teal-dim)"/>
+          <rect x="110" y="40" width="28" height="80" fill="var(--teal)"/>
+          <rect x="155" y="60" width="28" height="60" fill="var(--teal-dim)"/>
+          <rect x="200" y="30" width="28" height="90" fill="var(--teal)"/>
+          <text x="124" y="34" font-family="Inter" font-size="9" fill="var(--gold)" text-anchor="middle">7.8%</text>
+          <text x="214" y="24" font-family="Inter" font-size="9" fill="var(--gold)" text-anchor="middle">8.1%</text>
+        </svg>
+        <div class="chart-cap">Illustrative — YoY GDP growth by quarter</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow up">↑ Growth beat → risk-on, cyclicals &amp; banks lead</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">↑ Growth beat → yields tend to firm up (overheating fear)</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow up">↑ Growth beat → rupee often supported</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">↑ Growth beat → industrial demand expectations rise</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>India prints <strong>7.8% GDP growth</strong> against a <strong>6.9% consensus estimate</strong>. Autos, cement, and bank stocks (the most "GDP-sensitive" sectors) typically outperform that session, because analysts start nudging FY earnings estimates higher across the board — not because of the number itself, but because the economy is bigger than models assumed.</p></div>
+  </div>
+
+  <!-- 02 Inflation -->
+  <div class="entry" id="inflation">
+    <div class="entry-head"><span class="entry-num">02</span><h3>Inflation — CPI &amp; WPI</h3></div>
+    <p class="entry-alias">Consumer Price Index / Wholesale Price Index — "how much more expensive did stuff get?"</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>If a chocolate bar cost ₹10 last year and now costs ₹11, that's 10% inflation on chocolate. CPI just does this for hundreds of things a normal family buys — food, rent, clothes, fuel — and averages it.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> CPI tracks the price a <em>consumer</em> pays at the till; WPI tracks the price at the <em>factory/wholesale</em> gate, before retail markup — WPI often moves first and CPI follows with a lag.</p>
+        <p><strong>Why the market cares:</strong> Inflation is the single biggest input into a central bank's interest rate decision. Central banks (RBI, Fed) have explicit inflation targets (RBI: 4% ± 2%). Inflation running hot forces rate hikes; inflation cooling opens the door to rate cuts.</p>
+        <p><strong>The nuance:</strong> "Core inflation" strips out food and fuel (the volatile parts) — central banks watch core inflation more closely than the headline print, because food/fuel spikes are often temporary (a bad monsoon, a geopolitical oil shock) rather than a genuine demand problem.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)" stroke-width="1"/>
+          <line x1="20" y1="70" x2="240" y2="70" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="242" y="73" font-family="Inter" font-size="8" fill="var(--gold)">4% target</text>
+          <polyline points="20,55 65,45 110,60 155,80 200,68" fill="none" stroke="var(--teal)" stroke-width="2" class="dash-flow"/>
+          <circle cx="200" cy="68" r="3" fill="var(--teal)"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)">
+            <text x="10" y="135">J</text><text x="55" y="135">F</text><text x="100" y="135">M</text><text x="145" y="135">A</text><text x="190" y="135">M</text>
+          </g>
+        </svg>
+        <div class="chart-cap">Illustrative — CPI YoY vs. RBI target band</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow down">↑ Inflation surprise → sell-off, rate-sensitive sectors hit hardest</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">↑ Inflation surprise → yields spike, bond prices fall</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow mix">Mixed — hot inflation can weaken a currency (erosion) or strengthen it (rate-hike bets)</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">Gold typically catches a bid as an inflation hedge</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>CPI prints at <strong>6.3%</strong> against a <strong>5.4% estimate</strong>, driven by a spike in vegetable prices. Bond yields jump 15–20 bps within minutes as traders price in a higher probability of a rate hike at the next RBI policy meeting; rate-sensitive stocks (real estate, auto financiers) fall first and fastest.</p></div>
+  </div>
+
+  <!-- 03 Interest Rates -->
+  <div class="entry" id="rates">
+    <div class="entry-head"><span class="entry-num">03</span><h3>Interest Rates — Repo Rate / Fed Funds Rate</h3></div>
+    <p class="entry-alias">The price the central bank charges banks for money — "the price of money itself"</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>Imagine your parents charge you "interest" if you borrow ₹100 from them and pay it back later. If they suddenly say "now you owe me ₹110 instead of ₹105," you'll borrow less. Central banks do this to entire economies — raising or lowering the cost of borrowing money for every bank, business, and homeowner at once.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the Repo Rate (India) is the rate at which the RBI lends short-term money to commercial banks; the Fed Funds Rate is the US equivalent. This single number sets the floor for every other interest rate in the economy — home loans, car loans, corporate bonds, fixed deposits.</p>
+        <p><strong>Why the market cares:</strong> it's the "discount rate" used to value every future cash flow. A stock's value is really the sum of all its future profits, discounted back to today — raise the discount rate, and that same stream of future profits is worth less <em>today</em>, even if nothing about the company itself changed.</p>
+        <p><strong>Two-sided:</strong> rate cuts are good for growth stocks and long-duration bonds; rate hikes favour banks' net interest margins in the short run but hurt valuations broadly.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)" stroke-width="1"/>
+          <path d="M20,100 H90 V60 H160 V60 H240" fill="none" stroke="var(--gold)" stroke-width="2" class="dash-flow"/>
+          <text x="120" y="50" font-family="Inter" font-size="9" fill="var(--gold)" text-anchor="middle">+75 bps</text>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)">
+            <text x="15" y="135">Meet 1</text><text x="80" y="135">Meet 2</text><text x="150" y="135">Meet 3</text><text x="220" y="135">Meet 4</text>
+          </g>
+        </svg>
+        <div class="chart-cap">Illustrative — repo rate path across policy meetings</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow down">↑ Rate hike → valuations compress, growth/tech hit hardest</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">↑ Rate hike → existing bond prices fall (yields rise)</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow up">↑ Rate hike → currency often strengthens (higher yield attracts foreign capital)</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow down">↑ Rate hike → gold often softens (higher opportunity cost of holding a non-yielding asset)</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>The Fed raises rates by 25 bps and signals "two more hikes coming." US 10-Year yields jump, the dollar strengthens broadly, and FIIs pull money out of Indian equities to chase the now higher, safer US yield — the Nifty often drifts lower purely on this flow effect, even if nothing changed in Indian company earnings.</p></div>
+  </div>
+
+  <!-- 04 Bond Yields -->
+  <div class="entry" id="yields">
+    <div class="entry-head"><span class="entry-num">04</span><h3>Bond Yields — 10-Year G-Sec</h3></div>
+    <p class="entry-alias">The government's own borrowing cost — the "risk-free" benchmark rate</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>A bond is like an IOU. If you buy an IOU for ₹100 that promises ₹105 back in a year, your "yield" is 5%. If everyone suddenly wants to sell that IOU (price drops to ₹95) but it still pays ₹105, your yield just went up to about 10.5% — <strong>bond prices and yields always move in opposite directions.</strong></p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the return an investor earns for lending money to the government for 10 years. It's set by pure supply and demand for government bonds in the open market, and it moves every single day — unlike the repo rate, which only changes at scheduled policy meetings.</p>
+        <p><strong>Why the market cares:</strong> the 10-Year yield is literally the "risk-free rate" plugged into every valuation model on the street (DCF, equity risk premium, everything). It also front-runs the central bank — bond traders often price in a rate hike/cut weeks before the central bank actually announces it.</p>
+        <p><strong>The yield curve:</strong> when short-term yields rise above long-term yields ("inversion"), it's historically one of the more reliable recession warning signs — because it implies the market expects the central bank to be cutting rates later to fight a slowdown.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="20" x2="20" y2="120" stroke="var(--hair)"/>
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+          <polyline points="20,100 80,80 140,64 200,52 240,44" fill="none" stroke="var(--teal)" stroke-width="2" class="dash-flow"/>
+          <polyline points="20,60 80,55 140,58 200,68 240,78" fill="none" stroke="var(--red)" stroke-width="2" stroke-dasharray="4 3"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)">
+            <text x="15" y="135">3M</text><text x="75" y="135">2Y</text><text x="135" y="135">5Y</text><text x="195" y="135">10Y</text><text x="230" y="135">30Y</text>
+          </g>
+          <text x="235" y="40" font-family="Inter" font-size="8" fill="var(--teal)" text-anchor="end">Normal</text>
+          <text x="235" y="90" font-family="Inter" font-size="8" fill="var(--red)" text-anchor="end">Inverted</text>
+        </svg>
+        <div class="chart-cap">Illustrative — normal vs. inverted yield curve</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow down">Rising yields → higher discount rate → lower fair value for stocks, esp. high-P/E names</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Rising yields = falling prices for existing bondholders, by definition</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow up">Rising local yields (vs. global peers) → currency tends to attract inflows</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow down">Rising real yields → gold typically underperforms</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>India's 10-Year yield climbs from <strong>7.0% to 7.4%</strong> over a month on worries about extra government borrowing. Bank treasuries (who hold large bond books) book mark-to-market losses, and high-P/E IT/consumer stocks de-rate — because analysts now discount their future earnings at a higher rate, mechanically lowering fair value even with unchanged profit forecasts.</p></div>
+  </div>
+
+  <!-- 05 PMI -->
+  <div class="entry" id="pmi">
+    <div class="entry-head"><span class="entry-num">05</span><h3>PMI — Purchasing Managers' Index</h3></div>
+    <p class="entry-alias">A monthly survey of factory &amp; service bosses — "is business getting better or worse, right now?"</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>Imagine asking 50 shopkeepers each month: "did you sell more, hire more, and order more supplies than last month?" If most say yes, business is expanding. PMI just turns thousands of "yes/no" answers from factory and service managers into one single number.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> a diffusion index built from survey responses on new orders, output, employment, supplier delivery times, and inventories. <strong>50 is the dividing line</strong> — above 50 means the sector is expanding, below 50 means it's contracting. It comes in two flavours: Manufacturing PMI and Services PMI.</p>
+        <p><strong>Why the market cares:</strong> PMI is released just days after month-end (versus GDP, which lags by months) — it's one of the fastest, freshest reads on real economic momentum available, which is exactly why algorithmic and macro traders react to it within seconds of release.</p>
+        <p><strong>How to read it:</strong> the level matters less than the direction and the distance from 50 — a PMI moving from 54 to 58 signals accelerating expansion; one drifting from 51 to 49 signals a sector tipping into contraction.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="70" x2="240" y2="70" stroke="var(--gold)" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="242" y="73" font-family="Inter" font-size="8" fill="var(--gold)">50</text>
+          <polyline points="20,90 65,60 110,50 155,45 200,38" fill="none" stroke="var(--teal)" stroke-width="2" class="dash-flow"/>
+          <circle cx="200" cy="38" r="3" fill="var(--teal)"/>
+          <text x="200" y="28" font-family="Inter" font-size="9" fill="var(--teal)" text-anchor="middle">58.4</text>
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+        </svg>
+        <div class="chart-cap">Illustrative — manufacturing PMI, expansion accelerating</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow up">PMI above 50 &amp; rising → capex/industrial names re-rate higher</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow mix">Strong PMI can mean stronger growth but also inflation risk → mildly negative for bonds</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow up">Strong PMI generally currency-supportive</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">Strong manufacturing PMI → higher industrial metal demand expectations</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>India's Manufacturing PMI prints at <strong>58.4</strong>, an eight-month high, with new export orders leading the gain. Capital goods and industrial stocks rally that morning — the market reads this as confirmation that the capex cycle is genuinely broadening, not just a one-off government spending push.</p></div>
+  </div>
+
+  <!-- 06 IIP -->
+  <div class="entry" id="iip">
+    <div class="entry-head"><span class="entry-num">06</span><h3>IIP — Index of Industrial Production</h3></div>
+    <p class="entry-alias">What factories actually produced — mining, manufacturing &amp; electricity output</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>If PMI is asking the factory boss "how do you <em>feel</em> about business," IIP is actually counting how many toys, cars, and machines rolled off the factory floor. It's the "did you actually do it" number, not the "how do you feel about it" number.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the physical volume of output across mining, manufacturing, and electricity generation, weighted into a single index and compared year-on-year. Released roughly six weeks after the month it covers — noticeably laggier than PMI.</p>
+        <p><strong>Why the market cares:</strong> it's a hard, verified confirmation (or contradiction) of what the PMI survey suggested. When IIP and PMI diverge — say PMI is strong but IIP is weak — analysts start questioning whether the "feel-good" survey data is translating into real production.</p>
+        <p><strong>Sector read-through:</strong> capital goods output within IIP is watched closely as a genuine, hard proxy for private-sector capex intentions, versus government-driven infrastructure spend.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="90" x2="240" y2="90" stroke="var(--hair)"/>
+          <rect x="30" y="70" width="24" height="20" fill="var(--teal)"/>
+          <rect x="80" y="50" width="24" height="40" fill="var(--teal)"/>
+          <rect x="130" y="60" width="24" height="30" fill="var(--teal-dim)"/>
+          <rect x="180" y="35" width="24" height="55" fill="var(--teal)"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)">
+            <text x="15" y="105">Mining</text><text x="75" y="105">Mfg</text><text x="128" y="105">Elec</text><text x="175" y="105">CapGds</text>
+          </g>
+        </svg>
+        <div class="chart-cap">Illustrative — IIP YoY growth by segment</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow up">Strong capital-goods IIP → industrials, cement, capital equipment makers rally</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow mix">Muted direct impact; feeds into the same growth-vs-inflation debate as GDP</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow mix">Secondary signal, usually overshadowed by PMI/GDP</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">Strong electricity/mining output → higher near-term commodity demand</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>IIP grows just <strong>2.1%</strong> YoY even though the prior month's Manufacturing PMI was a robust 58. The market treats this as a yellow flag — either the PMI survey was capturing sentiment that hasn't converted into orders yet, or there's a base-effect distortion, and analysts wait for the next print to confirm which.</p></div>
+  </div>
+
+  <!-- 07 Unemployment -->
+  <div class="entry" id="unemployment">
+    <div class="entry-head"><span class="entry-num">07</span><h3>Unemployment Rate</h3></div>
+    <p class="entry-alias">The share of working-age people actively looking for a job but not finding one</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>If your class has 30 kids and 3 of them want a chore-job (like walking the neighbour's dog) but can't find anyone who'll hire them, your class "unemployment rate" is 10%.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the percentage of the labour force that is jobless and actively seeking work. Released monthly in the US (the closely-watched Non-Farm Payrolls report) and periodically in India via the Periodic Labour Force Survey.</p>
+        <p><strong>Why the market cares — the counter-intuitive part:</strong> a very <em>low</em> unemployment rate can actually spook bond markets. A tight job market means employers must pay more to attract workers, wages rise, and rising wages feed straight back into inflation — creating exactly the pressure central banks are trying to avoid.</p>
+        <p><strong>The "Goldilocks" zone:</strong> markets generally love unemployment that's low but <em>stable</em> or gently rising from a low base — it signals a "soft landing" where growth cools just enough to tame inflation without tipping into recession.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+          <polyline points="20,50 65,45 110,40 155,55 200,70" fill="none" stroke="var(--gold)" stroke-width="2" class="dash-flow"/>
+          <circle cx="110" cy="40" r="3" fill="var(--gold)"/>
+          <text x="110" y="30" font-family="Inter" font-size="9" fill="var(--gold)" text-anchor="middle">3.4% (50-yr low)</text>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)">
+            <text x="10" y="135">-4m</text><text x="100" y="135">Low</text><text x="190" y="135">+3m</text>
+          </g>
+        </svg>
+        <div class="chart-cap">Illustrative — unemployment rate near cycle lows, then normalising</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow mix">Very tight labour market → mixed (wage cost pressure vs. strong consumption)</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Falling unemployment (tighter labour market) → yields rise on inflation fear</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow up">Strong labour data usually currency-supportive (higher rate expectations)</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow mix">Indirect — via its effect on rate expectations and the dollar</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>US unemployment falls to <strong>3.4%</strong>, its lowest in 50 years, alongside stronger-than-expected wage growth. Rather than celebrating, equity markets often sell off on this kind of print — traders interpret it as "the Fed will have to keep rates higher for longer," which is a headwind for stock valuations.</p></div>
+  </div>
+
+  <!-- 08 Fiscal Deficit -->
+  <div class="entry" id="fiscal">
+    <div class="entry-head"><span class="entry-num">08</span><h3>Fiscal Deficit</h3></div>
+    <p class="entry-alias">The government spending more than it earns in a year — and having to borrow the gap</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>If your monthly pocket money is ₹500 but you spend ₹650, you're ₹150 "in deficit" — you'll have to borrow that ₹150 from someone (maybe a sibling), and you'll owe interest on it. A government does the same thing, just with lakhs of crores instead of rupees.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> total government expenditure minus total revenue, usually expressed as a percentage of GDP. India's central government targets a specific fiscal deficit number every Union Budget (a much-watched annual event for markets).</p>
+        <p><strong>Why the market cares:</strong> a wider deficit means the government must borrow more, which means issuing more bonds into the market. More bond supply, all else equal, pushes bond prices down and yields up — "crowding out" some private borrowing and nudging the whole interest rate structure higher.</p>
+        <p><strong>Quality matters too:</strong> markets react less harshly to a wide deficit if the extra borrowing funds productive capital expenditure (roads, railways, infrastructure) rather than pure consumption subsidies — the former is seen as growth-accretive, the latter as a longer-term drag.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="30" x2="20" y2="120" stroke="var(--hair)"/>
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+          <rect x="40" y="60" width="40" height="60" fill="var(--teal-dim)"/>
+          <rect x="110" y="45" width="40" height="75" fill="var(--gold)"/>
+          <rect x="180" y="70" width="40" height="50" fill="var(--teal)"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)" text-anchor="middle">
+            <text x="60" y="135">FY23</text><text x="130" y="135">FY24</text><text x="200" y="135">FY25 (Target)</text>
+          </g>
+          <text x="130" y="38" font-family="Inter" font-size="9" fill="var(--gold)" text-anchor="middle">5.9% of GDP</text>
+        </svg>
+        <div class="chart-cap">Illustrative — fiscal deficit as % of GDP</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow mix">Depends on spend quality — capex-heavy deficit can be a positive for infra/capital goods</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Wider-than-expected deficit → more bond supply → yields rise, prices fall</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow down">Persistently wide deficits are a long-run currency risk</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow mix">Indirect, via its effect on growth and government commodity purchases</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>The Union Budget targets a fiscal deficit of <strong>5.1% of GDP</strong>, better than the <strong>5.3% expected</strong>, while raising capital expenditure by 11%. Bond yields fall (bond prices rally) on the lower borrowing number, while infrastructure and capital goods stocks rally separately on the higher capex allocation — two different mechanisms, same budget document.</p></div>
+  </div>
+
+  <!-- 09 CAD/Trade -->
+  <div class="entry" id="cad">
+    <div class="entry-head"><span class="entry-num">09</span><h3>Current Account Deficit &amp; Trade Balance</h3></div>
+    <p class="entry-alias">How much more the country buys from the world than it sells to it</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>If you buy ₹200 worth of toys from your friend's toy shop but only sell him ₹150 worth of your own comics, you owe him ₹50 — you're running a "deficit" with your friend. India does this with the entire world, mainly because it imports a lot of oil.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> Trade Balance is exports minus imports of goods. The Current Account Deficit (CAD) is broader — it adds services trade (like IT exports), remittances from Indians working abroad, and investment income to the goods trade number.</p>
+        <p><strong>Why the market cares:</strong> a widening CAD means India needs more foreign currency (dollars) than it's earning, which it has to source by attracting foreign investment or drawing down forex reserves — either way, it's a direct pressure point on the rupee's exchange rate.</p>
+        <p><strong>India's biggest lever:</strong> crude oil is India's largest import bill by far, so the CAD is unusually sensitive to global oil prices — a $10/barrel rise in crude can widen India's CAD noticeably on its own, independent of everything else in the economy.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="70" x2="240" y2="70" stroke="var(--hair)"/>
+          <text x="10" y="73" font-family="Inter" font-size="8" fill="var(--ink-dim)">0</text>
+          <rect x="40" y="70" width="30" height="18" fill="var(--red)"/>
+          <rect x="100" y="70" width="30" height="30" fill="var(--red)"/>
+          <rect x="160" y="55" width="30" height="15" fill="var(--teal)"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)" text-anchor="middle">
+            <text x="55" y="105">Q1</text><text x="115" y="117">Q2 (oil spike)</text><text x="175" y="105">Q3</text>
+          </g>
+        </svg>
+        <div class="chart-cap">Illustrative — CAD as % of GDP (below line = deficit)</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow down">Widening CAD → oil marketing companies squeezed, importers hurt broadly</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Widening CAD often triggers RBI rate defence measures → yields firm up</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow down">Widening CAD → rupee depreciation pressure, directly</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow mix">A cause more than an effect here — usually driven BY oil prices, not driving them</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>Crude oil jumps from <strong>$75 to $95/barrel</strong> on a Middle East supply shock. India's CAD widens sharply the next quarter purely from the higher oil import bill, the rupee slides toward record lows against the dollar, and IT/pharma exporters (who earn in dollars) become relative safe havens while airlines and paint companies (heavy oil users) get hit.</p></div>
+  </div>
+
+  <!-- 10 USD/INR -->
+  <div class="entry" id="usdinr">
+    <div class="entry-head"><span class="entry-num">10</span><h3>USD/INR Exchange Rate</h3></div>
+    <p class="entry-alias">How many rupees it takes to buy one US dollar — the price of the rupee itself</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>If a US dollar toy costs ₹80 today but ₹85 next month, the rupee got "weaker" — you now need more rupees to buy the exact same dollar toy. Everything India imports (oil, phones, gadgets) gets pricier when this happens.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it moves with:</strong> interest rate differentials between India and the US, FII flow direction, the CAD, crude oil prices, and broad "risk-on/risk-off" sentiment globally (INR tends to weaken whenever global markets get nervous and money rushes to the safety of the dollar).</p>
+        <p><strong>Why the market cares:</strong> currency moves directly split the market into winners and losers. IT services and pharma companies earn a large share of revenue in dollars — a weaker rupee is a direct earnings tailwind for them. Companies with dollar-denominated debt or heavy import bills (airlines, oil marketing companies) get hurt by the same move.</p>
+        <p><strong>RBI's role:</strong> the RBI doesn't target a fixed exchange rate, but intervenes to smooth out excessive volatility — using forex reserves to buy or sell dollars so the rupee doesn't move too fast in either direction.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+          <polyline points="20,90 65,85 110,70 155,50 200,45" fill="none" stroke="var(--red)" stroke-width="2" class="dash-flow"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)" text-anchor="middle">
+            <text x="20" y="135">82.1</text><text x="110" y="135">83.4</text><text x="200" y="135">84.9</text>
+          </g>
+          <text x="200" y="35" font-family="Inter" font-size="9" fill="var(--red)" text-anchor="middle">Weaker ₹</text>
+        </svg>
+        <div class="chart-cap">Illustrative — USD/INR trend, rupee depreciating</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow mix">IT/pharma (exporters) benefit; aviation/oil/import-heavy names hurt</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Sharp rupee weakness can trigger RBI rate defence → yields rise</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="mono">— (this is the indicator itself)</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">Weaker rupee → imported commodities (oil, gold) get costlier in INR terms</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>The US Fed signals rates will "stay higher for longer" just as India's CAD is widening on costly oil. USD/INR drifts from <strong>82.5 to 84.0</strong> over a quarter. TCS and Infosys see a modest, mechanical margin tailwind on dollar revenue translation, while IndiGo (heavy dollar-denominated fuel and lease costs) faces the opposite squeeze.</p></div>
+  </div>
+
+  <!-- 11 Money Supply / Credit -->
+  <div class="entry" id="moneysupply">
+    <div class="entry-head"><span class="entry-num">11</span><h3>Money Supply (M3) &amp; Credit Growth</h3></div>
+    <p class="entry-alias">How much money and how much lending is actually circulating in the system</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>Imagine a piggy bank game where more coins keep getting added to everyone's piggy banks each month. If there's suddenly way more pocket money floating around your whole school, kids will spend more freely — and if too many coins chase too few toys, toy prices go up. That's basically money supply and inflation.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> M3 is the broadest standard measure of money in the economy — cash plus all bank deposits. Bank credit growth measures how fast banks are actually lending that money out to businesses and households.</p>
+        <p><strong>Why the market cares:</strong> credit growth is a real-time pulse on economic confidence — businesses only borrow to expand when they believe demand is coming, and banks only lend freely when they trust repayment capacity. It's also a direct read on banking sector earnings, since loan growth is the core driver of bank profits.</p>
+        <p><strong>The liquidity link:</strong> abundant system liquidity (easy money supply growth) tends to flow into risk assets, including equities — it's one reason equity markets have historically done well during periods of aggressive central bank money creation.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+          <polyline points="20,95 65,85 110,60 155,40 200,30" fill="none" stroke="var(--teal)" stroke-width="2" class="dash-flow"/>
+          <polyline points="20,100 65,92 110,80 155,68 200,58" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4 3"/>
+          <text x="205" y="28" font-family="Inter" font-size="8" fill="var(--teal)">Credit growth</text>
+          <text x="205" y="60" font-family="Inter" font-size="8" fill="var(--gold)">M3 growth</text>
+        </svg>
+        <div class="chart-cap">Illustrative — credit growth outpacing deposit/M3 growth</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow up">Strong credit growth → bank/NBFC earnings tailwind, broad risk-on liquidity</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Very rapid money supply growth → longer-run inflation risk, bearish for bonds</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow down">Excess money creation relative to peers can weigh on a currency over time</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">Ample liquidity often supportive for commodity and gold prices</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>Bank credit growth runs at <strong>16% YoY</strong> while deposit growth lags at <strong>11%</strong>. Private banks with strong deposit franchises (who can fund this lending cheaply) are rewarded by the market with premium valuations, while banks more reliant on expensive wholesale borrowing see margin pressure — the same macro number, two very different stock outcomes.</p></div>
+  </div>
+
+  <!-- 12 Crude Oil -->
+  <div class="entry" id="crude">
+    <div class="entry-head"><span class="entry-num">12</span><h3>Crude Oil Prices</h3></div>
+    <p class="entry-alias">India's single biggest import bill — the fuel behind almost everything</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>Think of crude oil as the "electricity bill" for the whole country — it powers the buses, makes the plastic in your toys, and runs the trucks that deliver your food. When that one bill goes up, almost everything else quietly gets a little more expensive too.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the global price of benchmark crude (Brent or WTI), set by international supply/demand, OPEC+ production decisions, and geopolitical risk. India imports roughly 85% of the crude oil it uses, making it unusually exposed to swings in this one price versus many other economies.</p>
+        <p><strong>Why the market cares:</strong> oil is a direct input into the CAD, the fiscal deficit (via fuel subsidies, where they exist), and headline inflation (transport costs feed into almost every consumer good's price) — it's one of the few single numbers that touches nearly every other indicator on this page.</p>
+        <p><strong>Sector split:</strong> a sharp, sustained fall in oil prices is broadly positive for India Inc — lower input costs, lower inflation, lower CAD — except for the oil producers and upstream companies themselves.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+          <polyline points="20,80 65,60 110,40 155,55 200,90" fill="none" stroke="var(--gold)" stroke-width="2" class="dash-flow"/>
+          <circle cx="110" cy="40" r="3" fill="var(--gold)"/>
+          <text x="110" y="30" font-family="Inter" font-size="9" fill="var(--gold)" text-anchor="middle">$95/bbl spike</text>
+          <text x="200" y="105" font-family="Inter" font-size="9" fill="var(--teal)" text-anchor="middle">$76/bbl</text>
+        </svg>
+        <div class="chart-cap">Illustrative — Brent crude, spike then retreat</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow down">Rising oil → paints, tyres, airlines, OMCs (as consumers) hurt; upstream (ONGC) benefits</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Rising oil → inflation risk rises → yields firm up</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow down">Rising oil → wider CAD → rupee pressure</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="mono">— (this is the indicator itself; correlates with related energy products)</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>Brent crude falls from <strong>$92 to $76/barrel</strong> as OPEC+ unexpectedly raises output. Indian paint, tyre, and airline stocks rally on lower raw material and fuel costs, CPI forecasts get trimmed by economists, and the rupee firms up a touch — a single commodity move rippling cleanly through equities, inflation expectations, and the currency in the same week.</p></div>
+  </div>
+
+  <!-- 13 FII/DII -->
+  <div class="entry" id="flows">
+    <div class="entry-head"><span class="entry-num">13</span><h3>FII / DII Flows</h3></div>
+    <p class="entry-alias">Who's actually buying and selling — foreign vs. domestic institutional money</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>Imagine a school canteen where two big groups of kids buy snacks: kids from your own school (DII, domestic money — mutual funds, insurance companies) and visiting kids from another school (FII, foreign money). If the visiting kids suddenly stop showing up and start buying snacks somewhere else, your canteen's sales drop even if your own school's kids keep buying the same amount.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> the daily net buying or selling of Indian equities by Foreign Institutional Investors (FIIs) and Domestic Institutional Investors (DIIs — mutual funds, insurance companies, pension funds), published every trading day.</p>
+        <p><strong>Why the market cares:</strong> flows are the most literal, mechanical driver of price — someone has to actually place the buy or sell order that moves the index. FII flows are highly sensitive to global rate differentials and risk sentiment (they chase the highest risk-adjusted yield globally); DII flows have grown structurally as India's SIP culture (monthly retail mutual fund investing) has scaled up, providing a steadier counterweight to volatile FII behaviour.</p>
+        <p><strong>Reading the tug-of-war:</strong> in recent years, sustained DII buying (fed by retail SIPs) has repeatedly cushioned the market even during heavy FII selling phases — a structural shift worth tracking as its own trend.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="75" x2="240" y2="75" stroke="var(--hair)"/>
+          <rect x="30" y="45" width="18" height="30" fill="var(--red)"/>
+          <rect x="55" y="75" width="18" height="25" fill="var(--teal)"/>
+          <rect x="90" y="40" width="18" height="35" fill="var(--red)"/>
+          <rect x="115" y="75" width="18" height="32" fill="var(--teal)"/>
+          <rect x="150" y="55" width="18" height="20" fill="var(--red)"/>
+          <rect x="175" y="75" width="18" height="28" fill="var(--teal)"/>
+          <g font-family="Inter" font-size="8" fill="var(--ink-dim)" text-anchor="middle">
+            <text x="40" y="118">FII</text><text x="65" y="118">DII</text>
+          </g>
+          <text x="230" y="45" font-family="Inter" font-size="8" fill="var(--red)" text-anchor="end">FII net sell</text>
+          <text x="230" y="115" font-family="Inter" font-size="8" fill="var(--teal)" text-anchor="end">DII net buy (cushioning)</text>
+        </svg>
+        <div class="chart-cap">Illustrative — daily net flows, ₹ crore</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="mono">— (this IS the direct mechanical driver of daily price action)</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow mix">FII debt flows separately affect G-Sec demand and yields</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow up">Sustained FII buying → dollar inflows → rupee support</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="mono">Largely independent, unless flows are part of a broader EM risk-off move</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>FIIs sell a net <strong>₹8,000 crore</strong> of Indian equities in a week as US yields spike, but DIIs absorb almost all of it with <strong>₹7,500 crore</strong> of net buying, fed by steady monthly SIP inflows. The Nifty ends the week largely flat despite the heavy foreign selling — a textbook example of the domestic flow cushion at work.</p></div>
+  </div>
+
+  <!-- 14 Consumer Confidence -->
+  <div class="entry" id="confidence">
+    <div class="entry-head"><span class="entry-num">14</span><h3>Consumer Confidence Index</h3></div>
+    <p class="entry-alias">How optimistic households feel about spending money in the months ahead</p>
+    <div class="kid-box"><span class="tag">Like a kid would get it</span><p>It's basically asking your whole family: "do you feel good enough about money right now to buy something fun this month, or are you going to save it just in case?" When lots of families feel good, they buy more — toys, clothes, eating out — and that shows up directly in company sales.</p></div>
+    <div class="grid2">
+      <div class="body-text">
+        <p><strong>What it measures:</strong> a survey-based index of household sentiment on current and expected income, spending, employment, and general economic conditions — released by central banks (RBI's Consumer Confidence Survey) and private agencies globally (University of Michigan Index, Conference Board Index in the US).</p>
+        <p><strong>Why the market cares:</strong> consumption is typically the single largest component of GDP in most economies — private consumption is roughly 55-60% of India's GDP. Confidence today is a leading indicator of spending tomorrow, which makes it a genuine forward-looking signal rather than a backward-looking one like GDP or IIP.</p>
+        <p><strong>Where it shows up first:</strong> FMCG, retail, auto (especially two-wheelers), and consumer durables companies are the most direct beneficiaries of a confidence upswing, since discretionary purchases are the first thing households cut when confidence falls and the first thing they resume when it recovers.</p>
+      </div>
+      <div class="chart-card">
+        <svg viewBox="0 0 260 150" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="70" x2="240" y2="70" stroke="var(--hair)" stroke-dasharray="3 3"/>
+          <text x="242" y="73" font-family="Inter" font-size="8" fill="var(--ink-dim)">Neutral</text>
+          <polyline points="20,85 65,90 110,75 155,55 200,42" fill="none" stroke="var(--teal)" stroke-width="2" class="dash-flow"/>
+          <circle cx="200" cy="42" r="3" fill="var(--teal)"/>
+          <line x1="20" y1="120" x2="240" y2="120" stroke="var(--hair)"/>
+        </svg>
+        <div class="chart-cap">Illustrative — consumer confidence, recovering from lows</div>
+      </div>
+    </div>
+    <div class="impact-row"><span class="lab">Equity</span><span class="arrow up">Rising confidence → FMCG, auto, retail, consumer durables lead</span></div>
+    <div class="impact-row"><span class="lab">Bonds</span><span class="arrow down">Strong confidence → stronger consumption → mild inflation/growth risk for yields</span></div>
+    <div class="impact-row"><span class="lab">Currency</span><span class="arrow mix">Secondary signal, usually folded into the broader growth narrative</span></div>
+    <div class="impact-row"><span class="lab">Commodities</span><span class="arrow up">Stronger durables demand can lift industrial metal demand expectations</span></div>
+    <div class="example"><span class="tag">Worked example</span><p>RBI's Consumer Confidence Survey shows the "future expectations" sub-index climbing to an <strong>18-month high</strong>, driven by improving employment perception. Two-wheeler and FMCG stocks tend to move ahead of the actual sales data — the market treats the confidence print as an early tell on the festive-season sales numbers still weeks away.</p></div>
+  </div>
+
+  <!-- CLOSING -->
+  <section class="closing">
+    <div class="section-head" style="padding-top:0;">
+      <div class="eyebrow">04 · Putting It Together</div>
+      <h2>How to actually use this in research</h2>
+      <p>The individual definitions matter less than the sequencing. Three habits are worth building into any pre-market or thematic note.</p>
+    </div>
+    <div class="cheat">
+      <h4>Reading order that mirrors how the market actually processes news</h4>
+      <ul>
+        <li><strong>Start with the surprise, not the level.</strong> A 6.1% CPI print is only meaningful relative to what was expected (5.7%) and where it's headed next — markets are pricing forecasts, not history.</li>
+        <li><strong>Trace the chain, don't stop at the first reaction.</strong> Inflation → rates → yields → valuations → flows → currency is one continuous loop; a single indicator's "first move" is rarely the full story.</li>
+        <li><strong>Separate the leading indicators from the lagging ones.</strong> PMI, consumer confidence, and FII/DII flows lead; GDP and IIP confirm after the fact — weight your pre-market view toward the leading set.</li>
+        <li><strong>Watch for divergences.</strong> When PMI is strong but IIP is weak, or FIIs are selling while DIIs are buying, the divergence itself is often more informative than either number alone.</li>
+        <li><strong>Sector-map every macro print before publishing.</strong> "GDP beat" means nothing to a client until it's translated into "cyclicals and banks," and "rupee weakens" means nothing until it's "IT/pharma tailwind, aviation/OMC headwind."</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span class="foot-label">SigmaOne Capital research desk · Macroeconomics learning</span>
+    All charts are illustrative sketches of typical relationships, not live market data; verify current prints against RBI, MOSPI, and NSE/BSE releases before publishing to clients. SigmaOne Capital · SEBI Reg. No. INH000027812
+  </div>
+
+</div>
+</body>
+</html>
